@@ -1,0 +1,20 @@
+# https://github.com/Chocobozzz/PeerTube/blob/v6.0.3/support/docker/production/Dockerfile.bookworm
+FROM chocobozzz/peertube:v6.0.3-bookworm
+
+WORKDIR /home/peertube/
+
+ENV HOME=/home/peertube
+
+# https://docs.joinpeertube.org/maintain/tools#peertube-runner
+RUN npm install -g @peertube/peertube-runner
+
+# peertube
+USER 999
+
+VOLUME [ "/home/peertube/.config/peertube-runner-nodejs/" ]
+VOLUME [ "/home/peertube/.cache/peertube-runner-nodejs/" ]
+VOLUME [ "/home/peertube/.local/share/peertube-runner-nodejs/" ]
+
+ENTRYPOINT [ ]
+
+CMD [ "peertube-runner" ]
