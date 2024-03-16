@@ -2,29 +2,35 @@ name: Docker Image CI
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      # Login to "owntube" organization on Docker Hub
       - uses: docker/login-action@v3
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      # Build and test PeerTube 5.2 image as tag "v521"
       - name: Build the `owntube/peertube-runner:v521` Docker image
         run: docker build . --file Dockerfile.bullseye --tag owntube/peertube-runner:v521
       - name: Test the `owntube/peertube-runner:v521` Docker image
-        run: docker run -it --rm --name v521-runner-help owntube/peertube-runner:v521 peertube-runner --help
-      - name: Push the `owntube/peertube-runner:v521` Docker image
-        run: docker push owntube/peertube-runner:v521
+        run: docker run -i --rm --name v521-runner-help owntube/peertube-runner:v521 peertube-runner --help
 
+      # Build and test PeerTube 6.0 image as tag "v603"
       - name: Build the `owntube/peertube-runner:v603` Docker image
         run: docker build . --file Dockerfile.bookworm --tag owntube/peertube-runner:v603
       - name: Test the `owntube/peertube-runner:v603` Docker image
-        run: docker run -it --rm --name v603-runner-help owntube/peertube-runner:v603 peertube-runner --help
+        run: docker run -i --rm --name v603-runner-help owntube/peertube-runner:v603 peertube-runner --help
+
+      # Push image tags "v521", "v603" and "latest"
+      - name: Push the `owntube/peertube-runner:v521` Docker image
+        run: docker push owntube/peertube-runner:v521
       - name: Push the `owntube/peertube-runner:v603` Docker image
         run: docker push owntube/peertube-runner:v603
       - name: Push the `owntube/peertube-runner:latest` Docker image
