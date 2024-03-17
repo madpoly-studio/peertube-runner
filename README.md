@@ -1,11 +1,11 @@
 # [`owntube/peertube-runner`](https://github.com/OwnTube-tv/peertube-runner)
 
-Containerized [@peertube/peertube-runner](https://www.npmjs.com/package/@peertube/peertube-runner) for remote execution
-of transcoding jobs in Kubernetes.
+Containerized Node [`@peertube/peertube-runner`](https://www.npmjs.com/package/@peertube/peertube-runner) for
+remote execution of transcoding jobs in Kubernetes.
 
 ## Container Image Variants
 
-### Image Variant 1: `owntube/peertube-runner:v521` PeerTube v5.2.1 Runner
+### Image Variant 1: `owntube/peertube-runner:v521` from PeerTube v5.2.1
 
 Build the container image:
 
@@ -23,12 +23,13 @@ docker run -it --rm -u root --name v521-runner-server \
   owntube/peertube-runner:v521 peertube-runner server
 ```
 
-### Image Variant 2: `owntube/peertube-runner:v603` (`:latest`) PeerTube v6.0.3 Runner
+### Image Variant 2: `owntube/peertube-runner:v603/latest` from PeerTube v6.0.3
 
 Build the container image:
 
 ```bash
 docker build -f Dockerfile.bookworm -t owntube/peertube-runner:v603 .
+docker tag owntube/peertube-runner:v603 owntube/peertube-runner:latest
 ```
 
 Test running the PeerTube runner server:
@@ -53,10 +54,10 @@ Communication (IPC).
 We need the following _PersistentVolumeClaims_ (PVCs):
 
 1. `peertube-runner-local` for things persisted in `/home/peertube/.local/share/peertube-runner-nodejs`
-2. `peertube-runner-config` for the tool's internal configs in `/home/peertube/.config/peertube-runner-nodejs`
-3. `peertube-runner-cache` for file storage during task execution in `/home/peertube/.cache/peertube-runner-nodejs`
+2. `peertube-runner-config` for the tool internals in `/home/peertube/.config/peertube-runner-nodejs`
+3. `peertube-runner-cache` for temp file storage in `/home/peertube/.cache/peertube-runner-nodejs`
 
-If we had a namespace named "peertube" and a storage class named "microk8s-hostpath", it could look like this:
+If we had a namespace named `"peertube"` and a storage class named `"microk8s-hostpath"`, it could look like this:
 
 ```bash
 kubectl apply -f - <<EOF
@@ -104,7 +105,7 @@ EOF
 
 ### Setup Step 2: Create a PeerTube Runner Pod
 
-To create a _Pod_ with 2 containers in the namespace "peertube", each running a PeerTube Runner server with the
+To create a _Pod_ with 2 containers in the namespace `"peertube"`, each running a PeerTube Runner server with the
 _PersistentVolumes_ (PVs) from _Setup Step 1_ above, and apply a Kubernetes manifest like this one:
 
 ```bash
@@ -160,7 +161,9 @@ Get the pod's status and logs:
     kubectl get pods/peertube-runner-pod --namespace peertube -o wide
     kubectl logs peertube-runner-pod --namespace peertube
 
-### Setup Step 3: Register the PeerTube Runner Servers with PeerTube Instances
+The logs should show no errors and indicate that the servers are up and idling.
+
+### Setup Step 3: Register the Runners with PeerTube Instances
 
 For illustration, let us assume that you have a PeerTube v5.2 instance that you want to connect `"peertube-runner-1"`
 to, and a PeerTube v6.0 instance that you want to connect `"peertube-runner-2"` to.
@@ -171,36 +174,38 @@ Get the URLs and the _Registration Tokens_ for each of the PeerTube instances an
 export PT_v52_RUNNER=peertube-runner-1
 export PT_v52_URL=https://my-peertube52.tv
 export PT_v52_TOKEN=ptrrt-e6657119-a21d-4217-75d8-1b491da3a169
-kubectl exec peertube-runner-pod --namespace peertube -- peertube-runner --id $PT_v52_RUNNER \
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v52_RUNNER \
   register --url $PT_v52_URL --registration-token $PT_v52_TOKEN --runner-name my-$PT_v52_RUNNER \
-  --runner-description="OwnTube-tv/peertube-runner project from @ar9708"
+  --runner-description="OwnTube-tv/peertube-runner project"
 # Verify it is registered:
-kubectl exec peertube-runner-pod --namespace peertube -- peertube-runner --id $PT_v52_RUNNER list-registered
-'┌──────────────────────────┬──────────────────────┬─────────────────────────────────────────────────┐'
-'│ instance                 │ runner name          │ runner description                              │'
-'├──────────────────────────┼──────────────────────┼─────────────────────────────────────────────────┤'
-'│ https://my-peertube52.tv │ my-peertube-runner-1 │ OwnTube-tv/peertube-runner project from @ar9708 │'
-'└──────────────────────────┴──────────────────────┴─────────────────────────────────────────────────┘'
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v52_RUNNER list-registered
+'┌──────────────────────────┬──────────────────────┬────────────────────────────────────┐'
+'│ instance                 │ runner name          │ runner description                 │'
+'├──────────────────────────┼──────────────────────┼────────────────────────────────────┤'
+'│ https://my-peertube52.tv │ my-peertube-runner-1 │ OwnTube-tv/peertube-runner project │'
+'└──────────────────────────┴──────────────────────┴────────────────────────────────────┘'
 ```
 
 ```bash
 export PT_v60_RUNNER=peertube-runner-2
 export PT_v60_URL=https://my-peertube60.tv
 export PT_v60_TOKEN=ptrrt-23586320-b92e-4521-21f7-3b4e1dc2b952
-kubectl exec peertube-runner-pod --namespace peertube -- peertube-runner --id $PT_v60_RUNNER \
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER \
   register --url $PT_v60_URL --registration-token $PT_v60_TOKEN --runner-name my-$PT_v60_RUNNER \
-  --runner-description="OwnTube-tv/peertube-runner project from @ar9708"
+  --runner-description="OwnTube-tv/peertube-runner project"
 # Verify it is registered:
-kubectl exec peertube-runner-pod --namespace peertube -- peertube-runner --id $PT_v60_RUNNER list-registered
-'┌──────────────────────────┬──────────────────────┬─────────────────────────────────────────────────┐'
-'│ instance                 │ runner name          │ runner description                              │'
-'├──────────────────────────┼──────────────────────┼─────────────────────────────────────────────────┤'
-'│ https://my-peertube60.tv │ my-peertube-runner-2 │ OwnTube-tv/peertube-runner project from @ar9708 │'
-'└──────────────────────────┴──────────────────────┴─────────────────────────────────────────────────┘'
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER list-registered
+'┌──────────────────────────┬──────────────────────┬────────────────────────────────────┐'
+'│ instance                 │ runner name          │ runner description                 │'
+'├──────────────────────────┼──────────────────────┼────────────────────────────────────┤'
+'│ https://my-peertube60.tv │ my-peertube-runner-2 │ OwnTube-tv/peertube-runner project │'
+'└──────────────────────────┴──────────────────────┴────────────────────────────────────┘'
 ```
 
 Once transcoding starts being processed, you should find that there are a few files in the persistent storage, but they
-are not expected to accumulate over time in terms of volume:
+are not expected to accumulate over time in terms of volume.
+
+Here is an illustration from my Kubernetes master, what it usually looks like (structurally):
 
 ```plain
 /mnt/hostpath-lv/
