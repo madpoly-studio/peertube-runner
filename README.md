@@ -23,7 +23,7 @@ docker run -it --rm -u root --name v521-runner-server \
   owntube/peertube-runner:v521 peertube-runner server
 ```
 
-### Image Variant 2: `owntube/peertube-runner:v603/latest` from PeerTube v6.0.3
+### Image Variant 2: `owntube/peertube-runner:v603` (`latest`) from PeerTube v6.0.3
 
 Build the container image:
 
@@ -175,10 +175,11 @@ export PT_v52_RUNNER=peertube-runner-1
 export PT_v52_URL=https://my-peertube52.tv
 export PT_v52_TOKEN=ptrrt-e6657119-a21d-4217-75d8-1b491da3a169
 kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v52_RUNNER \
-  register --url $PT_v52_URL --registration-token $PT_v52_TOKEN --runner-name my-$PT_v52_RUNNER \
-  --runner-description="OwnTube-tv/peertube-runner project"
+  register --url $PT_v52_URL --registration-token $PT_v52_TOKEN \
+  --runner-name my-$PT_v52_RUNNER --runner-description="OwnTube-tv/peertube-runner project"
 # Verify it is registered:
-kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v52_RUNNER list-registered
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v52_RUNNER \
+  list-registered
 '┌──────────────────────────┬──────────────────────┬────────────────────────────────────┐'
 '│ instance                 │ runner name          │ runner description                 │'
 '├──────────────────────────┼──────────────────────┼────────────────────────────────────┤'
@@ -191,10 +192,11 @@ export PT_v60_RUNNER=peertube-runner-2
 export PT_v60_URL=https://my-peertube60.tv
 export PT_v60_TOKEN=ptrrt-23586320-b92e-4521-21f7-3b4e1dc2b952
 kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER \
-  register --url $PT_v60_URL --registration-token $PT_v60_TOKEN --runner-name my-$PT_v60_RUNNER \
-  --runner-description="OwnTube-tv/peertube-runner project"
+  register --url $PT_v60_URL --registration-token $PT_v60_TOKEN \
+  --runner-name my-$PT_v60_RUNNER --runner-description="OwnTube-tv/peertube-runner project"
 # Verify it is registered:
-kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER list-registered
+kubectl exec peertube-runner-pod -n peertube -- peertube-runner --id $PT_v60_RUNNER \
+  list-registered
 '┌──────────────────────────┬──────────────────────┬────────────────────────────────────┐'
 '│ instance                 │ runner name          │ runner description                 │'
 '├──────────────────────────┼──────────────────────┼────────────────────────────────────┤'
