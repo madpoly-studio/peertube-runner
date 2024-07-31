@@ -54,7 +54,7 @@ register() {
       --id default \
       --url $PEERTUBE_RUNNER_INSTANCE_URL \
       --registration-token $PEERTUBE_RUNNER_REGISTER_TOKEN \
-      --runner-name $HOSTNAME
+      --runner-name "${PEERTUBE_RUNNER_PREFIX}${HOSTNAME}"
 
     peertube-runner --id default list-registered
 
@@ -68,7 +68,7 @@ echo "🐳(entrypoint) running your command: ${*}"
 CONFIG_DIRECTORY=~/.config/peertube-runner-nodejs/default
 CONFIG_FILE="$CONFIG_DIRECTORY"/config.toml
 
-if [ ! -f "$CONFIG_FILE" ] || ! (cat $CONFIG_FILE | grep "runnerName = \"$HOSTNAME\""); then
+if [ ! -f "$CONFIG_FILE" ] || ! (cat $CONFIG_FILE | grep "runnerName = \"${PEERTUBE_RUNNER_PREFIX}${HOSTNAME}\""); then
   register "$@" &
 else
   update_config
