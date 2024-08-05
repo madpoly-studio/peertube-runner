@@ -9,12 +9,15 @@ ENV HOME=/home/peertube
 RUN npm install -g @peertube/peertube-runner
 
 RUN mkdir -p /home/peertube/.config/peertube-runner-nodejs/default \
-  && mkdir -p /home/peertube/.cache/peertube-runner-nodejs/default \
-  && mkdir -p /home/peertube/.local/share/peertube-runner-nodejs/default \
-  && chown -R 999:999 /home/peertube/
+&& mkdir -p /home/peertube/.cache/peertube-runner-nodejs/default \
+&& mkdir -p /home/peertube/.local/share/peertube-runner-nodejs/default \
+&& chown -R 999:999 /home/peertube/
 
 COPY imagescripts/entrypoint.sh /
 RUN chmod 755 /entrypoint.sh
+
+# See https://github.com/Softcatala/whisper-ctranslate2
+RUN pip install -U whisper-ctranslate2 --break-system-packages
 
 # peertube
 USER 999

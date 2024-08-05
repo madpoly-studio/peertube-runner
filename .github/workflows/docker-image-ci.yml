@@ -23,12 +23,12 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      # Build and test PeerTube 6.0 image as tag "v6.2.0-bookworm"
-      - name: Build the `ghcr.io/madpoly-studio/peertube-runner:v6.2.0-bookworm` Docker image
-        run: docker build . --file Dockerfile.bookworm --tag ghcr.io/madpoly-studio/peertube-runner:v6.2.0-bookworm
-      - name: Test the `ghcr.io/madpoly-studio/peertube-runner:v6.2.0-bookworm` Docker image
-        run: docker run -i --rm --name v6-runner-help ghcr.io/madpoly-studio/peertube-runner:v6.2.0-bookworm peertube-runner --help
+      # Build and test PeerTube 6.0 image as tag "v6.2.1-bookworm"
+      - name: Build the `ghcr.io/madpoly-studio/peertube-runner:v6.2.1-bookworm` Docker image
+        run: docker build . --file Dockerfile.bookworm --tag ghcr.io/madpoly-studio/peertube-runner:v6.2.1-bookworm
+      - name: Test the `ghcr.io/madpoly-studio/peertube-runner:v6.2.1-bookworm` Docker image
+        run: docker run -i --rm --name v6-runner-help ghcr.io/madpoly-studio/peertube-runner:v6.2.1-bookworm peertube-runner --help
 
-      # Push image tags "v6.2.0-bookworm" and "latest"
-      - name: Push the `ghcr.io/madpoly-studio/peertube-runner:v6.2.0-bookworm` Docker image
-        run: docker push ghcr.io/madpoly-studio/peertube-runner:v6.2.0-bookworm
+      # Push image tags "v6.2.1-bookworm" and "latest"
+      - name: Push the `ghcr.io/madpoly-studio/peertube-runner:v6.2.1-bookworm` Docker image
+        run: docker push ghcr.io/madpoly-studio/peertube-runner:v6.2.1-bookworm
